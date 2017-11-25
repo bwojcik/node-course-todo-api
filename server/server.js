@@ -8,6 +8,7 @@ const {ObjectId} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
+var {authenticate} = require('./middleware/authenticate.js');
 
 var app = express();
 var port = process.env.PORT;
@@ -96,7 +97,6 @@ app.patch('/todos/:id', (request, response) => {
 	});
 });
 
-//POST /users
 app.post('/users', (request, response) => {
 	var body = _.pick(request.body, ['email', 'password']);
 	var user = new User(body);
@@ -108,6 +108,12 @@ app.post('/users', (request, response) => {
 	}).catch((e) => {
 		response.status(400).send(e);
 	});
+});
+
+
+
+app.get('/users/me', authenticate, (request, response) => {
+	response.send(request.user);
 });
 
 app.listen(port, () => {
